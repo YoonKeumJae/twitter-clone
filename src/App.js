@@ -4,8 +4,23 @@ import Home from "./routes/Home";
 import Profile from "./routes/Profile";
 import Login from "./routes/Login";
 import CreateAccount from "./routes/CreateAccount";
+import createGlobalStyle from "styled-components";
+import reset from "styled-reset";
 
 function App() {
+  const GlobalStyles = createGlobalStyle`
+    ${reset};
+    *{
+      box-sizing: border-box;
+    }
+    body{
+      background-color: black;
+      color: white;
+      font-family: system-ui;
+
+    }
+  `;
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -27,12 +42,13 @@ function App() {
     },
     {
       path: "/create-account",
-      element: <CreateAccount/>
-    }
+      element: <CreateAccount />,
+    },
   ]);
 
   return (
     <>
+      <GlobalStyles />
       <RouterProvider router={router} />
     </>
   );
