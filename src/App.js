@@ -38,12 +38,12 @@ function App() {
   const init = async () => {
     //wait for firebase
     setTimeout(() => setIsLoading(false), 2000);
-    // setIsLoading(false);
   };
 
   useEffect(() => {
     init();
   }, []);
+  
   return (
     <>
       <GlobalStyles />
