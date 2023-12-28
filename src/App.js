@@ -8,6 +8,13 @@ import CreateAccount from "./routes/CreateAccount";
 import LoadingScreen from "./components/LoadingScreen";
 import GlobalStyles from "./styles/GlobalStyles";
 import { auth } from "./firebase";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
 
 const router = createBrowserRouter([
   {
@@ -39,7 +46,7 @@ function App() {
   const init = async () => {
     //wait for firebase
     await auth.authStateReady();
-    setIsLoading(false);  
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -47,10 +54,10 @@ function App() {
   }, []);
 
   return (
-    <>
+    <Wrapper>
       <GlobalStyles />
       {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-    </>
+    </Wrapper>
   );
 }
 
