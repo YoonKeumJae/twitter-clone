@@ -33,12 +33,17 @@ const Input = styled.input`
   }
 `;
 
+const Error = styled.span`
+  font-weight: 600;
+  color: tomato;
+`;
+
 const CreateAccount = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
   const onChange = (e) => {
     const target = e.target;
@@ -58,7 +63,7 @@ const CreateAccount = () => {
       // set the name of user's profile
       // redirect to homepage
     } catch (e) {
-      // setError(e.message);
+      setError(e.message);
     } finally {
       setIsLoading(false);
     }
@@ -98,6 +103,7 @@ const CreateAccount = () => {
           value={isLoading ? "Loading..." : "Create Account"}
         />
       </Form>
+      {error !== "" ? <Error>{error}</Error> : null}
     </Wrapper>
   );
 };
