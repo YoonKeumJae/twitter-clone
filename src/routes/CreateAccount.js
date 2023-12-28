@@ -1,5 +1,8 @@
 import styled from "styled-components";
 import { useState } from "react";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -45,6 +48,8 @@ const CreateAccount = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   const onChange = (e) => {
     const target = e.target;
     if (target.name === "name") {
@@ -56,12 +61,26 @@ const CreateAccount = () => {
     }
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault(); // prevent refresh
+    if (isLoading || email === "" || password === "" || name === "") {
+      return;
+    }
     try {
+      setIsLoading(true);
       // create an account
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(credentials.user);
       // set the name of user's profile
+      await updateProfile(credentials.user, {
+        displayName: name,
+      });
       // redirect to homepage
+      navigate("/");
     } catch (e) {
       setError(e.message);
     } finally {
