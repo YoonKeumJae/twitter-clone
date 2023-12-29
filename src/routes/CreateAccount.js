@@ -3,6 +3,7 @@ import { useState } from "react";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -17,6 +18,7 @@ const Title = styled.h1`
 `;
 const Form = styled.form`
   margin-top: 50px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -63,6 +65,7 @@ const CreateAccount = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault(); // prevent refresh
+    setError(""); // reset error
     if (isLoading || email === "" || password === "" || name === "") {
       return;
     }
@@ -83,6 +86,9 @@ const CreateAccount = () => {
       navigate("/");
     } catch (e) {
       setError(e.message);
+      if (e instanceof FirebaseError) {
+        setError(e.message);
+      }
     } finally {
       setIsLoading(false);
     }
