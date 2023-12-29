@@ -86,7 +86,6 @@ const CreateAccount = () => {
     } finally {
       setIsLoading(false);
     }
-    console.log(name, email, password);
   };
 
   return (
