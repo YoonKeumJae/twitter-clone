@@ -11,6 +11,7 @@ import {
   Error,
   Switcher,
 } from "../components/AuthComponents";
+import GithubBtn from "../components/GithubBtn";
 
 const CreateAccount = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +101,7 @@ const CreateAccount = () => {
       <Switcher>
         Already have an account? <Link to="/login">Log in &rarr;</Link>
       </Switcher>
+      <GithubBtn />
     </Wrapper>
   );
 };
