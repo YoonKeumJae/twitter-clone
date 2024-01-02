@@ -2,7 +2,7 @@ import { useState } from "react";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import {
   Wrapper,
   Title,
@@ -12,12 +12,16 @@ import {
   Switcher,
 } from "../components/AuthComponents";
 import GithubBtn from "../components/GithubBtn";
+import styled from "styled-components";
+
+const PasswordReset = styled.span``;
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [reset, setReset] = useState(false);
 
   const navigate = useNavigate();
 
@@ -51,6 +55,20 @@ const Login = () => {
     }
   };
 
+  const onClickReset = () => {
+    setReset(!reset);
+  };
+
+  const onClickResetSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("email sent");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <Wrapper>
       <Title>Log into 𝕏</Title>
@@ -78,6 +96,23 @@ const Login = () => {
         Don't have an account?{" "}
         <Link to="/create-account">Create Account &rarr;</Link>
       </Switcher>
+      <PasswordReset>
+        Forgot your password?{" "}
+        <button onClick={onClickReset}>Reset &rarr;</button>
+        {reset ? (
+          <form>
+            <input
+              type="email"
+              placeholder="input your email"
+              onChange={onChange}
+              name="email"
+            ></input>
+            <button type="submit" onClick={onClickResetSubmit}>
+              Send
+            </button>
+          </form>
+        ) : null}
+      </PasswordReset>
       <GithubBtn />
     </Wrapper>
   );
