@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { db, auth } from "../firebase";
 
 const Form = styled.form`
   display: flex;
@@ -55,17 +57,39 @@ const PostTweetForm = () => {
   const [isLoading, setLoading] = useState(false);
   const [tweet, setTweet] = useState("");
   const [file, setFile] = useState(null);
+
   const onChange = (e) => {
     setTweet(e.target.value);
   };
+
   const onFileChange = (e) => {
     const files = e.target;
     if (files && files.length === 1) {
       setFile(files[0]);
     }
   };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user || isLoading || tweet.length > 180 || tweet === "") return;
+    try {
+      setLoading(true);
+      await addDoc(collection(db, "tweets"), {
+        tweet,
+        createdAt: Date.now(),
+        userName: user.displayName|| "Anonymous",
+        userId: user.uid,
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
         rows={5}
         maxLength={180}
