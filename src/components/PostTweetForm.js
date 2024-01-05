@@ -78,7 +78,7 @@ const PostTweetForm = () => {
       await addDoc(collection(db, "tweets"), {
         tweet,
         createdAt: Date.now(),
-        userName: user.displayName|| "Anonymous",
+        userName: user.displayName || "Anonymous",
         userId: user.uid,
       });
     } catch (e) {
@@ -91,6 +91,7 @@ const PostTweetForm = () => {
   return (
     <Form onSubmit={onSubmit}>
       <TextArea
+        required
         rows={5}
         maxLength={180}
         onChange={onChange}
