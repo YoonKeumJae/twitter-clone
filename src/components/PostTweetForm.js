@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { addDoc, collection } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import { db, auth, storage } from "../firebase";
+import { ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -75,12 +76,16 @@ const PostTweetForm = () => {
     if (!user || isLoading || tweet.length > 180 || tweet === "") return;
     try {
       setLoading(true);
-      await addDoc(collection(db, "tweets"), {
+      const doc = await addDoc(collection(db, "tweets"), {
         tweet,
         createdAt: Date.now(),
         userName: user.displayName || "Anonymous",
         userId: user.uid,
       });
+      if(file){
+        const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`);
+        await uploadBytes(locationRef, file);
+      }
     } catch (e) {
       console.log(e);
     } finally {
