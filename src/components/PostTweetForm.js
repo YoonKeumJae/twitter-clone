@@ -64,7 +64,7 @@ const PostTweetForm = () => {
   };
 
   const onFileChange = (e) => {
-    const files = e.target;
+    const { files } = e.target;
     if (files && files.length === 1) {
       setFile(files[0]);
     }
@@ -82,8 +82,11 @@ const PostTweetForm = () => {
         userName: user.displayName || "Anonymous",
         userId: user.uid,
       });
-      if(file){
-        const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`);
+      if (file) {
+        const locationRef = ref(
+          storage,
+          `tweets/${user.uid}-${user.displayName}/${doc.id}`
+        );
         await uploadBytes(locationRef, file);
       }
     } catch (e) {
