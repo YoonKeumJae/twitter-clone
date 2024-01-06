@@ -65,6 +65,10 @@ const PostTweetForm = () => {
 
   const onFileChange = (e) => {
     const { files } = e.target;
+    if (files[0].size > 1000000) {
+        alert("File size should be less than 1MB");
+        return;
+    } 
     if (files && files.length === 1) {
       setFile(files[0]);
     }
