@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
+import { useState } from "react";
+import EditTweetForm from "./EditTweetForm";
 
 const Wrapper = styled.div`
   display: grid;
@@ -35,14 +37,35 @@ const Delete = styled.button`
   border-radius: 5px;
   cursor: pointer;
 `;
+const Update = styled.button`
+  background-color: skyblue;
+  color: white;
+  font-weight: 600;
+  border: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+`;
 
 const Tweet = ({ userName, photo, tweet, userId, id }) => {
   const user = auth.currentUser;
 
+  const [isEditing, setIsEditing] = useState(false);
+
+  const onEdit = () => {
+    if (user.uid !== userId) return;
+    setIsEditing(true);
+  };
+
+  const endEdit = () => {
+    setIsEditing(false);
+  };
+
   const onDelete = async () => {
     const ok = window.confirm("Are you sure you want to delete this tweet?");
     if (!ok || user.uid !== userId) return;
-    if (user.uid !== userId) return;
     try {
       await deleteDoc(doc(db, "tweets", id));
       if (photo) {
@@ -58,16 +81,31 @@ const Tweet = ({ userName, photo, tweet, userId, id }) => {
     <Wrapper>
       <Column>
         <UserName>{userName}</UserName>
-        <Payload>{tweet}</Payload>
+        {isEditing ? (
+          <EditTweetForm
+            tweet={tweet}
+            photo={photo}
+            userId={userId}
+            id={id}
+            endEdit={endEdit}
+          />
+        ) : (
+          <>
+            <Payload>{tweet}</Payload>
+            {photo ? (
+              <Column>
+                <Photo src={photo} />
+              </Column>
+            ) : null}
+          </>
+        )}
         {user.uid === userId ? (
-          <Delete onClick={onDelete}>Delete</Delete>
+          <>
+            <Delete onClick={onDelete}>Delete</Delete>
+            <Update onClick={onEdit}>Update</Update>
+          </>
         ) : null}
       </Column>
-      {photo ? (
-        <Column>
-          <Photo src={photo} />
-        </Column>
-      ) : null}
     </Wrapper>
   );
 };
