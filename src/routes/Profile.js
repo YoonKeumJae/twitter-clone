@@ -1,8 +1,17 @@
 import styled from "styled-components";
-import { auth, storage } from "../firebase";
-import { useState } from "react";
+import { auth, db, storage } from "../firebase";
+import { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
+import Tweet from "../components/Tweet";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,10 +42,16 @@ const AvatarInput = styled.input`
 const Name = styled.span`
   font-size: 22px;
 `;
+const Tweets = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
 
 const Profile = () => {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
+  const [tweets, setTweets] = useState([]);
 
   const onAvatarChange = async (e) => {
     const { files } = e.target;
@@ -50,6 +65,33 @@ const Profile = () => {
       await updateProfile(user, { photoURL: avatarUrl });
     }
   };
+
+  const fetchTweets = async () => {
+    const tweetsQuery = query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    );
+    const snapshot = await getDocs(tweetsQuery);
+    const tweets = snapshot.docs.map((doc) => {
+      const { tweet, createdAt, userId, userName, photo } = doc.data();
+      return {
+        tweet,
+        createdAt,
+        userId,
+        userName,
+        photo,
+        id: doc.id,
+      };
+    });
+    setTweets(tweets);
+  };
+
+  useEffect(() => {
+    fetchTweets();
+  }, []);
+
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
@@ -77,6 +119,11 @@ const Profile = () => {
         accept="image/*"
       />
       <Name>{user?.displayName ?? "Anonymous"}</Name>
+      <Tweets>
+        {tweets.map((tweet) => (
+          <Tweet key={tweet.id} {...tweet} />
+        ))}
+      </Tweets>
     </Wrapper>
   );
 };
