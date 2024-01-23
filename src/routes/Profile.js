@@ -47,11 +47,18 @@ const Tweets = styled.div`
   flex-direction: column;
   gap: 10px;
 `;
+const EditNameForm = styled.div``;
+
+const EditNameInput = styled.input``;
+
+const EditNameButton = styled.button``;
 
 const Profile = () => {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [tweets, setTweets] = useState([]);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState("");
 
   const onAvatarChange = async (e) => {
     const { files } = e.target;
@@ -90,7 +97,29 @@ const Profile = () => {
 
   useEffect(() => {
     fetchTweets();
-  }, []);
+  });
+
+  const onClickEditName = () => {
+    setIsEditingName(true);
+  };
+
+  const onChangeName = async () => {
+    if (!user) return;
+    try {
+      await updateProfile(user, {
+        displayName: newName,
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsEditingName(false);
+    }
+  };
+
+  const onChangeNewNameInput = (e) => {
+    setNewName(e.target.value);
+    console.log(newName);
+  };
 
   return (
     <Wrapper>
@@ -118,7 +147,25 @@ const Profile = () => {
         type="file"
         accept="image/*"
       />
-      <Name>{user?.displayName ?? "Anonymous"}</Name>
+      {isEditingName ? (
+        <EditNameForm>
+          <EditNameInput
+            type="text"
+            placeholder="Enter new name"
+            onChange={onChangeNewNameInput}
+          />
+          <EditNameButton type="button" onClick={onChangeName}>
+            OK
+          </EditNameButton>
+        </EditNameForm>
+      ) : (
+        <Name>
+          {user?.displayName ?? "Anonymous"}
+          <button type="button" onClick={onClickEditName}>
+            edit name
+          </button>
+        </Name>
+      )}
       <Tweets>
         {tweets.map((tweet) => (
           <Tweet key={tweet.id} {...tweet} />
